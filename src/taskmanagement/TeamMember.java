@@ -18,5 +18,9 @@ public class TeamMember extends User {
 	public TeamMember(String name, String role) {
 		super(name, role);
 	}
+
+	public TeamMember(String id, String name, String role) {
+		super(id, name, role);
+	}
 	
 }

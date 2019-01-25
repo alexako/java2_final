@@ -1,2 +1,3 @@
 {"cards":[{"id":"4d0b676e-b84c-4346-8b94-7533c00f8086","title":"Test card","assignedUser":{"name":"Tom Hanks","id":"fe156285-bee7-4e5d-941b-7be6cd766233"}},{"id":"0eaa6741-1ce5-4782-95f6-000afcc428ab","title":"Another test card","assignedUser":{"name":"Tom Hanks","id":"fe156285-bee7-4e5d-941b-7be6cd766233"}}],"id":"b493794c-6fc3-4d95-91cd-6570c2d14773","title":"Test board"}
 {"cards":[],"id":"a89cad3a-1ef4-4f1b-92f6-c652d5bb1e73","title":"Test GUI board"}
+{"cards":[{"id":"bf5ddbfd-a971-47b7-a90f-dae0d0930057","title":"Card GUI test","assignedUser":{"name":"Test GUI name","id":"4f906b32-30e2-4450-b762-5cbc27b35565"}}],"id":"dd4cf1d8-8352-4d4d-aaaf-8e97d86bf90a","title":null}

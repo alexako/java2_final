@@ -30,7 +30,8 @@ import javafx.stage.Stage;
 public class GUI extends Application {
 
     Stage window;
-    TextField titleInput, descriptionInput, quantityInput;
+    TextField titleInput;
+    ComboBox userSelection;
     GridPane gridPane;
     ObservableList<Card> cards;
 
@@ -130,14 +131,11 @@ public class GUI extends Application {
         titleInput.setPromptText("Title");
         titleInput.setMinWidth(100);
 
-        // Details input
-        descriptionInput = new TextField();
-        descriptionInput.setPromptText("Description");
-
         // Add Card Button
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> addButtonClicked());
 
+        // Card click handler
         EventHandler<javafx.scene.input.MouseEvent> eventHandler = 
                     new EventHandler<javafx.scene.input.MouseEvent>() { 
             @Override 
@@ -159,28 +157,28 @@ public class GUI extends Application {
 
         // Load cards
         cards = getCards();
-        for (int i = 0; i < cards.size(); i++) {
-            Button cardContainer = new Button(cards.get(i).getTitle());
-            cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-            cardContainer.setAlignment(Pos.BASELINE_LEFT);
-            cardContainer.setEffect(ds);
-            cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-            column1.getChildren().add(cardContainer);
-        }
-        for (int i = 0; i < cards.size() - 5; i++) {
-            Button cardContainer = new Button(cards.get(i).getTitle());
-            cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-            cardContainer.setAlignment(Pos.BASELINE_LEFT);
-            cardContainer.setEffect(ds);
-            cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-            column2.getChildren().add(cardContainer);
-        }
-        Button cardContainer = new Button(cards.get(7).getTitle());
-        cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-        cardContainer.setAlignment(Pos.BASELINE_LEFT);
-        cardContainer.setEffect(ds);
-        cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-        column3.getChildren().add(cardContainer);
+        // for (int i = 0; i < cards.size(); i++) {
+        //     Button cardContainer = new Button(cards.get(i).getTitle());
+        //     cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
+        //     cardContainer.setAlignment(Pos.BASELINE_LEFT);
+        //     cardContainer.setEffect(ds);
+        //     cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
+        //     column1.getChildren().add(cardContainer);
+        // }
+        // for (int i = 0; i < cards.size() - 5; i++) {
+        //     Button cardContainer = new Button(cards.get(i).getTitle());
+        //     cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
+        //     cardContainer.setAlignment(Pos.BASELINE_LEFT);
+        //     cardContainer.setEffect(ds);
+        //     cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
+        //     column2.getChildren().add(cardContainer);
+        // }
+        // Button cardContainer = new Button(cards.get(7).getTitle());
+        // cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
+        // cardContainer.setAlignment(Pos.BASELINE_LEFT);
+        // cardContainer.setEffect(ds);
+        // cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
+        // column3.getChildren().add(cardContainer);
 
         Label projectName = new Label("Project Title");
 
@@ -188,13 +186,14 @@ public class GUI extends Application {
         header.getChildren().addAll(projectName);
         header.setAlignment(Pos.CENTER);
 
-        ComboBox userSelection = new ComboBox();
+        userSelection = new ComboBox();
         userSelection.getItems().addAll(users);
+
 
         HBox control = new HBox();
         control.setPadding(new Insets(10,10,10,10));
         control.setSpacing(10);
-        control.getChildren().addAll(titleInput, descriptionInput, userSelection, addButton);
+        control.getChildren().addAll(titleInput, userSelection, addButton);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(gridPane);
@@ -220,31 +219,52 @@ public class GUI extends Application {
 
     //Add button clicked
     public void addButtonClicked(){
-        // Product product = new Product();
-        // product.setName(nameInput.getText());
-        // product.setPrice(Double.parseDouble(priceInput.getText()));
-        // product.setQuantity(Integer.parseInt(quantityInput.getText()));
-        // table.getItems().add(product);
-        // nameInput.clear();
-        // priceInput.clear();
-        // quantityInput.clear();
 
-        // private String id;
-        // private String title;
-        // private String description;
-        // private User assignedUser;
-        // private int boardId;
-        // private int columnIndex;
+        Card card = TaskManagement.createCard(titleInput.getText(),
+            (User)userSelection.getValue(),
+            new Board());
+        
+        System.out.println("AddButtonClicked: added card");
 
-
-        Card card = new Card();
-        card.setTitle(titleInput.getText());
-        card.setDescription(descriptionInput.getText());
         cards.add(card);
-        gridPane.add(new Button(card.getTitle()), 0, cards.size());
+        gridPane.add(prepareCard(card), 0, (cards.size()-2));
 
         titleInput.clear();
-        descriptionInput.clear();
+    }
+
+    public DropShadow getDropShadow() {
+
+        // Drop shadow for cards
+        DropShadow ds = new DropShadow();
+        ds.setBlurType(BlurType.GAUSSIAN);
+        ds.setColor(Color.DARKGRAY);
+        ds.setHeight(1);
+        ds.setWidth(1);
+        ds.setOffsetX(1);
+        ds.setOffsetY(1);
+        ds.setRadius(5);
+        ds.setSpread(0.01);
+
+        return ds;
+    }
+
+    public Button prepareCard(Card card) {
+
+        EventHandler<javafx.scene.input.MouseEvent> eventHandler = 
+                    new EventHandler<javafx.scene.input.MouseEvent>() { 
+            @Override 
+            public void handle(javafx.scene.input.MouseEvent e) { 
+                System.out.println("Click!" + e); 
+            } 
+        };  
+
+        Button cardContainer = new Button(card.getTitle());
+        cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
+        cardContainer.setAlignment(Pos.BASELINE_LEFT);
+        cardContainer.setEffect(getDropShadow());
+        cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
+
+        return cardContainer;
     }
 
     //Get all of the products

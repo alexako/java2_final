@@ -58,36 +58,29 @@ public class TaskManagement {
 		System.out.println(boardName + " successfully created and saved.");
 	}
 
-	public static void createCard() {
-		Scanner input = new Scanner(System.in);
-		System.out.print("Enter card title: ");
-		String cardTitle = input.nextLine();
+	public static Card createCard(String cardTitle, User assignedUser, Board assignedBoard) {
 
 		FileHandler fileHandler = new FileHandler();
 
-		displayData("user");
-		System.out.print("Select user to assign: ");
-		String assignedUserSelection = input.next();
+		TeamMember selectedTeamMember = new TeamMember(assignedUser.getId(),
+			assignedUser.getName(),
+			assignedUser.getRole());
+		Board selectedBoard = assignedBoard;
 
-		ArrayList<User> users = fileHandler.getUsers();
-		User selectedUser = users.get(Integer.parseInt(assignedUserSelection) - 1);
-		System.out.println(selectedUser.getName() + ", " + selectedUser.getRole() + " has been assigned to this card.");
+		Card card = new Card(cardTitle, selectedTeamMember);
+		card.assignCard(selectedTeamMember);
+		System.out.println(selectedTeamMember.getName() + ", " + selectedTeamMember.getRole() + " has been assigned to this card.");
 
-		displayData("board");
-		System.out.print("Select board to add this card to: ");
-		String boardSelection = input.next();
-		ArrayList<Board> boards = fileHandler.getBoards();
-		Board selectedBoard = boards.get(Integer.parseInt(boardSelection) - 1);
+		selectedBoard.addCard(card);
 		System.out.println(cardTitle + " has been added to " + selectedBoard.getTitle());
 
-		Card card = new Card(cardTitle, selectedUser);
-		selectedBoard.addCard(card);
-
 		fileHandler.writeToFile(card);
-		fileHandler.writeToFile(selectedBoard);
+		// fileHandler.writeToFile(selectedBoard);
 
 		System.out.println(selectedBoard.getTitle() + " successfully updated with new card.");
 		System.out.println(cardTitle + " successfully created and saved.");
+
+		return card;
 	}
 
 	public static void createUser(String userName, String userRole) {
