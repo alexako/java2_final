@@ -48,10 +48,7 @@ public class TaskManagement {
 	// 	System.out.println("Task management system is exiting...");
 	// }
 
-	public static void createBoard() {
-		Scanner input = new Scanner(System.in);
-		System.out.print("Enter board title: ");
-		String boardName = input.nextLine();
+	public static void createBoard(String boardName) {
 		Board board = new Board(boardName);
 		List<String> columns = Arrays.asList("To Do", "In Progress", "Review");
 		board.setColumns(columns);
@@ -93,12 +90,7 @@ public class TaskManagement {
 		System.out.println(cardTitle + " successfully created and saved.");
 	}
 
-	public static void createUser() {
-		Scanner input = new Scanner(System.in);
-		System.out.print("Enter user role: ");
-		String userRole = input.nextLine();
-		System.out.print("Enter user name: ");
-		String userName = input.nextLine();
+	public static void createUser(String userName, String userRole) {
 
 		FileHandler fileHandler = new FileHandler();
 		if (userRole.equals("developer")) {

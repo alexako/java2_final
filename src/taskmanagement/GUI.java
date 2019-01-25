@@ -1,7 +1,9 @@
 package taskmanagement;
 
+import javafx.event.ActionEvent;
 import java.util.ArrayList;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -12,12 +14,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
@@ -63,9 +67,32 @@ public class GUI extends Application {
         Menu m = new Menu("File"); 
 
         // create menuitems 
-        MenuItem m1 = new MenuItem("menu item 1"); 
-        MenuItem m2 = new MenuItem("menu item 2"); 
-        MenuItem m3 = new MenuItem("menu item 3"); 
+        MenuItem m1 = new MenuItem("Create new board..."); 
+        MenuItem m2 = new MenuItem("Add new user..."); 
+        MenuItem m3 = new MenuItem("Quit"); 
+
+        EventHandler<ActionEvent> createBoard = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Text boardTitle = BoardForm.display();
+                TaskManagement.createBoard(boardTitle.getText());
+                System.out.println(boardTitle.getText());
+            }
+        };
+        EventHandler<ActionEvent> addUser = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                User newUser = UserForm.display();
+                TaskManagement.createUser(newUser.getName(), newUser.getRole());
+            }
+        };
+        EventHandler<ActionEvent> quit = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Platform.exit();
+            }
+        };
+
+        m1.setOnAction(createBoard);  
+        m2.setOnAction(addUser);  
+        m3.setOnAction(quit);  
 
         // add menu items to menu 
         m.getItems().add(m1); 
