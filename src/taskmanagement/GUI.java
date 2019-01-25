@@ -32,6 +32,10 @@ public class GUI extends Application {
     Stage window;
     TextField titleInput;
     ComboBox userSelection;
+    int todoIndex = 0;
+    int inProgressIndex = 0;
+    int reviewIndex = 0;
+    FileHandler fileHandler;
     GridPane gridPane;
     ObservableList<Card> cards;
 
@@ -41,6 +45,7 @@ public class GUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        fileHandler = new FileHandler();
         window = primaryStage;
         window.setTitle("Task Management Project - Java 2");
 
@@ -109,9 +114,8 @@ public class GUI extends Application {
         // create a VBox 
         VBox vb = new VBox(mb); 
 
-        FileHandler f = new FileHandler();
-        f.loadUsers();
-        ArrayList<User> users = f.getUsers();
+        fileHandler.loadUsers();
+        ArrayList<User> users = fileHandler.getUsers();
 
         // Set column labels
         Label toDoLabel = new Label("To Do");
@@ -157,28 +161,7 @@ public class GUI extends Application {
 
         // Load cards
         cards = getCards();
-        // for (int i = 0; i < cards.size(); i++) {
-        //     Button cardContainer = new Button(cards.get(i).getTitle());
-        //     cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-        //     cardContainer.setAlignment(Pos.BASELINE_LEFT);
-        //     cardContainer.setEffect(ds);
-        //     cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-        //     column1.getChildren().add(cardContainer);
-        // }
-        // for (int i = 0; i < cards.size() - 5; i++) {
-        //     Button cardContainer = new Button(cards.get(i).getTitle());
-        //     cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-        //     cardContainer.setAlignment(Pos.BASELINE_LEFT);
-        //     cardContainer.setEffect(ds);
-        //     cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-        //     column2.getChildren().add(cardContainer);
-        // }
-        // Button cardContainer = new Button(cards.get(7).getTitle());
-        // cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
-        // cardContainer.setAlignment(Pos.BASELINE_LEFT);
-        // cardContainer.setEffect(ds);
-        // cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
-        // column3.getChildren().add(cardContainer);
+        loadCards();
 
         Label projectName = new Label("Project Title");
 
@@ -227,7 +210,7 @@ public class GUI extends Application {
         System.out.println("AddButtonClicked: added card");
 
         cards.add(card);
-        gridPane.add(prepareCard(card), 0, (cards.size()-2));
+        gridPane.add(prepareCard(card), 0, cards.size());
 
         titleInput.clear();
     }
@@ -268,18 +251,47 @@ public class GUI extends Application {
     }
 
     //Get all of the products
-    public ObservableList<Card> getCards(){
-         ObservableList<Card> cards = FXCollections.observableArrayList();
-         cards.add(new Card("1", "Fix UI"));
-         cards.add(new Card("2", "Refactor initial load"));
-         cards.add(new Card("3", "Add new feature 1"));
-         cards.add(new Card("4", "Add new feature 2"));
-         cards.add(new Card("5", "Fix UI"));
-         cards.add(new Card("6", "Refactor initial load"));
-         cards.add(new Card("7", "Add new feature 1"));
-         cards.add(new Card("8", "Add new feature 2"));
-
-        return cards;
+    public ObservableList<Card> getCards() {
+        return FXCollections.observableArrayList(fileHandler.getCards());
     }
+
+    public void loadCards() {
+        for (int i = 0; i < cards.size(); i++) {
+            Card card = cards.get(i);
+            int column = card.getColumnIndex();
+            gridPane.add(prepareCard(card), column, getColumnIndex(column));
+            incrementColumn(column);
+        }
+    }
+
+    /**
+     * todoIndex = 0;
+     * inProgressIndex = 0;
+     * reviewIndex = 0;
+     */
+    public int getColumnIndex(int column) {
+        int index = 0;
+
+        switch(column) {
+            case 0: index = todoIndex; break;
+            case 1: index = inProgressIndex; break;
+            case 2: index = reviewIndex; break;
+        }
+        return index;
+    }
+
+    public void incrementColumn(int column) {
+        switch(column) {
+            case 0: todoIndex++; break;
+            case 1: inProgressIndex++; break;
+            case 2: reviewIndex++; break;
+        }
+
+        System.out.println("todoIndex:" + todoIndex);
+        System.out.println("inProgressIndex:" + inProgressIndex);
+        System.out.println("reviewIndex:" + reviewIndex);
+        System.out.println(" ");
+    }
+
 
 }
