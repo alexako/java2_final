@@ -293,7 +293,8 @@ public class GUI extends Application {
             } 
         };  
 
-        Button cardContainer = new Button(card.getTitle());
+        String label = card.getTitle() + "\n\n" + card.getAssignedUser().getName();
+        Button cardContainer = new Button(label);
         cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
         cardContainer.setAlignment(Pos.BASELINE_LEFT);
         cardContainer.setEffect(getDropShadow());
