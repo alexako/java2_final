@@ -26,6 +26,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class GUI extends Application {
 
@@ -38,6 +39,7 @@ public class GUI extends Application {
     FileHandler fileHandler;
     GridPane gridPane;
     ObservableList<Card> cards;
+    ArrayList<User> users;
 
     public static void main(String[] args) {
         launch(args);
@@ -69,6 +71,8 @@ public class GUI extends Application {
         EventHandler<ActionEvent> addUser = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent t) {
                 User newUser = UserForm.display();
+                users.add(newUser);
+                refreshUserList();
                 TaskManagement.createUser(newUser.getName(), newUser.getRole());
             }
         };
@@ -94,7 +98,7 @@ public class GUI extends Application {
         mb.getMenus().add(m); 
 
         fileHandler.loadUsers();
-        ArrayList<User> users = fileHandler.getUsers();
+        users = fileHandler.getUsers();
 
 
         // Card Title input
@@ -115,6 +119,16 @@ public class GUI extends Application {
 
         userSelection = new ComboBox();
         userSelection.getItems().addAll(users);
+        Callback<ListView<User>, ListCell<User>> factory = lv -> new ListCell<User>() {
+
+            @Override
+            protected void updateItem(User item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? "" : item.getName());
+            }
+        
+        };
+        userSelection.setCellFactory(factory);
 
 
         HBox control = new HBox();
@@ -222,6 +236,11 @@ public class GUI extends Application {
         inProgressIndex = 1;
         reviewIndex = 1;
         loadCards();
+    }
+
+    public void refreshUserList() {
+        userSelection.getItems().clear();
+        userSelection.getItems().addAll(users);
     }
 
     //Add button clicked
