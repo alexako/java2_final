@@ -40,6 +40,7 @@ public class GUI extends Application {
     GridPane gridPane;
     ObservableList<Card> cards;
     ArrayList<User> users;
+    Board board = null;
 
     public static void main(String[] args) {
         launch(args);
@@ -57,10 +58,17 @@ public class GUI extends Application {
         Menu m = new Menu("File"); 
 
         // create menuitems 
+        MenuItem m0 = new MenuItem("Open board..."); 
         MenuItem m1 = new MenuItem("Create new board..."); 
         MenuItem m2 = new MenuItem("Add new user..."); 
         MenuItem m3 = new MenuItem("Quit"); 
 
+        EventHandler<ActionEvent> openBoard = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                board = BoardSelection.display();
+                refreshGrid();
+            }
+        };
         EventHandler<ActionEvent> createBoard = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent t) {
                 Text boardTitle = BoardForm.display();
@@ -82,11 +90,13 @@ public class GUI extends Application {
             }
         };
 
+        m0.setOnAction(openBoard);  
         m1.setOnAction(createBoard);  
         m2.setOnAction(addUser);  
         m3.setOnAction(quit);  
 
         // add menu items to menu 
+        m.getItems().add(m0); 
         m.getItems().add(m1); 
         m.getItems().add(m2); 
         m.getItems().add(m3); 
@@ -246,14 +256,22 @@ public class GUI extends Application {
     //Add button clicked
     public void addButtonClicked(){
 
+        Board b = new Board();
+        if (board != null) {
+            b = board;
+        }
+
         Card card = TaskManagement.createCard(titleInput.getText(),
             (User)userSelection.getValue(),
-            new Board());
+            b);
         
         System.out.println("AddButtonClicked: added card");
 
         cards.add(card);
         gridPane.add(prepareCard(card), 0, cards.size());
+
+        fileHandler.writeToFile(b);
+        System.out.println("updated board" + b.getCards());
 
         titleInput.clear();
     }
@@ -314,8 +332,18 @@ public class GUI extends Application {
         for (int i = 0; i < cards.size(); i++) {
             Card card = cards.get(i);
             int column = card.getColumnIndex();
-            gridPane.add(prepareCard(card), column, getColumnIndex(column));
-            incrementColumn(column);
+            if (board != null) {
+                board.getCards().forEach(c -> {
+                    System.out.println(c.getTitle());
+                    if (c.getId().equals(card.getId())) {
+                        gridPane.add(prepareCard(card), column, getColumnIndex(column));
+                        incrementColumn(column);
+                    }
+                });
+            } else {
+                gridPane.add(prepareCard(card), column, getColumnIndex(column));
+                incrementColumn(column);
+            }
         }
     }
 
