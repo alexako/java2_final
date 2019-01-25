@@ -208,19 +208,57 @@ public class FileHandler {
     }
 
     public void writeToFile(Card card) {
-		JSONObject cardObj = new JSONObject();
-	    cardObj.put("id", card.getId());
-		cardObj.put("title", card.getTitle());
-		cardObj.put("description", card.getDescription());
-		cardObj.put("assignedUser", card.getAssignedUser().getId());
-        try (FileWriter file = new FileWriter(this.cardsFilename, true)) {
-            file.append(cardObj.toJSONString());
-            file.append('\n');
-		    System.out.println("Successfully created new card: " + cardObj);
-        } catch(Exception e) {
-            System.out.println("Error: Could not save card: " + cardObj);
-            e.printStackTrace();
-        }
+
+		boolean update = false;
+
+		ArrayList<Card> cards = getCards();
+		for (int i = 0; i < cards.size(); i++) {
+			if (cards.get(i).getId().equals(card.getId())) {
+				cards.set(i, card);
+				update = true;
+			}
+		}
+
+		if (update) {
+			try (FileWriter file = new FileWriter(this.cardsFilename, false)) {
+				cards.forEach((c) -> {
+					JSONObject cardObj = new JSONObject();
+					cardObj.put("id", c.getId());
+					cardObj.put("title", c.getTitle());
+					cardObj.put("description", c.getDescription());
+					cardObj.put("assignedUser", c.getAssignedUser().getId());
+					cardObj.put("columnIndex", c.getColumnIndex());
+					try {
+						file.append(cardObj.toJSONString());
+						file.append('\n');
+						System.out.println("Successfully created new card: " + cardObj);
+					} catch(Exception e) {
+						System.out.println("Error: Could not save card: " + cardObj);
+						e.printStackTrace();
+					}
+				});
+			} catch(Exception e) {
+				System.out.println("Error: Could not save card: ");
+				e.printStackTrace();
+			}
+		} else {
+			JSONObject cardObj = null;
+			try (FileWriter file = new FileWriter(this.cardsFilename, true)) {
+				cardObj = new JSONObject();
+				cardObj.put("id", card.getId());
+				cardObj.put("title", card.getTitle());
+				cardObj.put("description", card.getDescription());
+				cardObj.put("assignedUser", card.getAssignedUser().getId());
+				cardObj.put("columnIndex", card.getColumnIndex());
+
+				file.append(cardObj.toJSONString());
+				file.append('\n');
+				System.out.println("Successfully created new card: " + cardObj);
+			} catch(Exception e) {
+				System.out.println("Error: Could not save card: " + cardObj);
+				e.printStackTrace();
+			}
+		}
     }
 
     public ArrayList<User> getUsers() {
@@ -272,13 +310,36 @@ public class FileHandler {
     public ArrayList<Card> getCards() {
 	    ArrayList<Card> cards = new ArrayList();
 	    for (Object card : this.cards) {
-		    JSONObject cardObj = (JSONObject)card;
-		    cards.add(new Card(
-			cardObj.get("id").toString(),
-			cardObj.get("title").toString()
-		    ));
-	    }
+			JSONObject cardObj = (JSONObject)card;
+			User user = getUserById(cardObj.get("assignedUser").toString());
+			Card c;
+			if (user != null) {
+				TeamMember t = new TeamMember(user.getId(), user.getName(), user.getRole());
+				c = new Card(cardObj.get("id").toString(), cardObj.get("title").toString(), t);
+			} else {
+				c = new Card(cardObj.get("id").toString(), cardObj.get("title").toString());
+			}
+			if (cardObj.get("description") != null) {
+				c.setDescription(cardObj.get("description").toString());
+			}
+			if (cardObj.get("columnIndex") != null) {
+				c.assignColumn(Integer.parseInt(cardObj.get("columnIndex").toString()));
+			}
+			if (!cards.contains(c)) {
+				cards.add(c);
+			}
+		}
 
 	    return cards;
-    }
+	}
+	
+	public User getUserById(String userId) {
+		ArrayList<User> users = getUsers();
+		for(User user: users) {
+			if(user.getId().equals(userId)) {
+				return user;
+			}
+		}
+		return null;
+	}
 }

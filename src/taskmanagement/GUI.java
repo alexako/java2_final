@@ -32,9 +32,9 @@ public class GUI extends Application {
     Stage window;
     TextField titleInput;
     ComboBox userSelection;
-    int todoIndex = 0;
-    int inProgressIndex = 0;
-    int reviewIndex = 0;
+    int todoIndex = 1;
+    int inProgressIndex = 1;
+    int reviewIndex = 1;
     FileHandler fileHandler;
     GridPane gridPane;
     ObservableList<Card> cards;
@@ -49,25 +49,7 @@ public class GUI extends Application {
         window = primaryStage;
         window.setTitle("Task Management Project - Java 2");
 
-        gridPane = new GridPane();
-
-        gridPane.setPadding(new Insets(5));
-        gridPane.setHgap(5);
-        gridPane.setVgap(5);
-
-        VBox column1 = new VBox();
-        VBox column2 = new VBox();
-        VBox column3 = new VBox();
-        column1.setSpacing(5);
-        column2.setSpacing(5);
-        column3.setSpacing(5);
-        column1.setPrefWidth(240);
-        column2.setPrefWidth(240);
-        column3.setPrefWidth(240);
-
-        gridPane.add(column1, 0, 0);
-        gridPane.add(column2, 1, 0);
-        gridPane.add(column3, 2, 0);
+        buildGrid();
 
         // create a menu 
         Menu m = new Menu("File"); 
@@ -111,24 +93,9 @@ public class GUI extends Application {
         // add menu to menubar 
         mb.getMenus().add(m); 
 
-        // create a VBox 
-        VBox vb = new VBox(mb); 
-
         fileHandler.loadUsers();
         ArrayList<User> users = fileHandler.getUsers();
 
-        // Set column labels
-        Label toDoLabel = new Label("To Do");
-        Label inProgressLabel = new Label("In Progress");
-        Label forReviewLabel = new Label("For Review");
-
-        toDoLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
-        inProgressLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
-        forReviewLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
-
-        column1.getChildren().add(toDoLabel);
-        column2.getChildren().add(inProgressLabel);
-        column3.getChildren().add(forReviewLabel);
 
         // Card Title input
         titleInput = new TextField();
@@ -139,29 +106,6 @@ public class GUI extends Application {
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> addButtonClicked());
 
-        // Card click handler
-        EventHandler<javafx.scene.input.MouseEvent> eventHandler = 
-                    new EventHandler<javafx.scene.input.MouseEvent>() { 
-            @Override 
-            public void handle(javafx.scene.input.MouseEvent e) { 
-                System.out.println("Click!" + e); 
-            } 
-        };  
-
-        // Drop shadow for cards
-        DropShadow ds = new DropShadow();
-        ds.setBlurType(BlurType.GAUSSIAN);
-        ds.setColor(Color.DARKGRAY);
-        ds.setHeight(1);
-        ds.setWidth(1);
-        ds.setOffsetX(1);
-        ds.setOffsetY(1);
-        ds.setRadius(5);
-        ds.setSpread(0.01);
-
-        // Load cards
-        cards = getCards();
-        loadCards();
 
         Label projectName = new Label("Project Title");
 
@@ -198,6 +142,86 @@ public class GUI extends Application {
         Scene scene = new Scene(root, 800, 600);
         window.setScene(scene);
         window.show();
+    }
+
+    public void buildGrid() {
+
+        gridPane = new GridPane();
+        gridPane.setPadding(new Insets(5));
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
+
+        VBox column1 = new VBox();
+        VBox column2 = new VBox();
+        VBox column3 = new VBox();
+
+        column1.setSpacing(5);
+        column2.setSpacing(5);
+        column3.setSpacing(5);
+        column1.setPrefWidth(240);
+        column2.setPrefWidth(240);
+        column3.setPrefWidth(240);
+
+        // Set column labels
+        Label toDoLabel = new Label("To Do");
+        Label inProgressLabel = new Label("In Progress");
+        Label forReviewLabel = new Label("For Review");
+
+        toDoLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+        inProgressLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+        forReviewLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+
+        column1.getChildren().add(toDoLabel);
+        column2.getChildren().add(inProgressLabel);
+        column3.getChildren().add(forReviewLabel);
+        gridPane.add(column1, 0, 0);
+        gridPane.add(column2, 1, 0);
+        gridPane.add(column3, 2, 0);
+
+        todoIndex = 1;
+        inProgressIndex = 1;
+        reviewIndex = 1;
+        cards = getCards();
+        loadCards();
+    }
+
+    public void refreshGrid() {
+        gridPane.getChildren().clear();
+        gridPane.setPadding(new Insets(5));
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
+
+        VBox column1 = new VBox();
+        VBox column2 = new VBox();
+        VBox column3 = new VBox();
+
+        column1.setSpacing(5);
+        column2.setSpacing(5);
+        column3.setSpacing(5);
+        column1.setPrefWidth(240);
+        column2.setPrefWidth(240);
+        column3.setPrefWidth(240);
+
+        // Set column labels
+        Label toDoLabel = new Label("To Do");
+        Label inProgressLabel = new Label("In Progress");
+        Label forReviewLabel = new Label("For Review");
+
+        toDoLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+        inProgressLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+        forReviewLabel.setStyle("-fx-label-padding: 10px; -fx-wrap-text: true;");
+
+        column1.getChildren().add(toDoLabel);
+        column2.getChildren().add(inProgressLabel);
+        column3.getChildren().add(forReviewLabel);
+        gridPane.add(column1, 0, 0);
+        gridPane.add(column2, 1, 0);
+        gridPane.add(column3, 2, 0);
+
+        todoIndex = 1;
+        inProgressIndex = 1;
+        reviewIndex = 1;
+        loadCards();
     }
 
     //Add button clicked
@@ -237,7 +261,16 @@ public class GUI extends Application {
                     new EventHandler<javafx.scene.input.MouseEvent>() { 
             @Override 
             public void handle(javafx.scene.input.MouseEvent e) { 
-                System.out.println("Click!" + e); 
+                Card c = CardDetails.display(card);
+                if (c != null) {
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).getId().equals(c.getId())) {
+                            cards.set(i, c);
+                        }
+                    }
+                    fileHandler.writeToFile(c);
+                    refreshGrid();
+                }
             } 
         };  
 
@@ -265,12 +298,12 @@ public class GUI extends Application {
     }
 
     /**
-     * todoIndex = 0;
-     * inProgressIndex = 0;
-     * reviewIndex = 0;
+     * 0 todoIndex
+     * 1 inProgressIndex
+     * 2 reviewIndex
      */
     public int getColumnIndex(int column) {
-        int index = 0;
+        int index = 1;
 
         switch(column) {
             case 0: index = todoIndex; break;
@@ -286,11 +319,6 @@ public class GUI extends Application {
             case 1: inProgressIndex++; break;
             case 2: reviewIndex++; break;
         }
-
-        System.out.println("todoIndex:" + todoIndex);
-        System.out.println("inProgressIndex:" + inProgressIndex);
-        System.out.println("reviewIndex:" + reviewIndex);
-        System.out.println(" ");
     }
 
 
