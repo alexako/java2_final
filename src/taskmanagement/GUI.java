@@ -1,7 +1,9 @@
 package taskmanagement;
 
+import javafx.event.ActionEvent;
 import java.util.ArrayList;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -12,12 +14,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
@@ -51,13 +55,58 @@ public class GUI extends Application {
         column1.setSpacing(5);
         column2.setSpacing(5);
         column3.setSpacing(5);
-        column1.setPrefWidth(250);
-        column2.setPrefWidth(250);
-        column3.setPrefWidth(250);
+        column1.setPrefWidth(240);
+        column2.setPrefWidth(240);
+        column3.setPrefWidth(240);
 
         gridPane.add(column1, 0, 0);
         gridPane.add(column2, 1, 0);
         gridPane.add(column3, 2, 0);
+
+        // create a menu 
+        Menu m = new Menu("File"); 
+
+        // create menuitems 
+        MenuItem m1 = new MenuItem("Create new board..."); 
+        MenuItem m2 = new MenuItem("Add new user..."); 
+        MenuItem m3 = new MenuItem("Quit"); 
+
+        EventHandler<ActionEvent> createBoard = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Text boardTitle = BoardForm.display();
+                TaskManagement.createBoard(boardTitle.getText());
+                System.out.println(boardTitle.getText());
+            }
+        };
+        EventHandler<ActionEvent> addUser = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                User newUser = UserForm.display();
+                TaskManagement.createUser(newUser.getName(), newUser.getRole());
+            }
+        };
+        EventHandler<ActionEvent> quit = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Platform.exit();
+            }
+        };
+
+        m1.setOnAction(createBoard);  
+        m2.setOnAction(addUser);  
+        m3.setOnAction(quit);  
+
+        // add menu items to menu 
+        m.getItems().add(m1); 
+        m.getItems().add(m2); 
+        m.getItems().add(m3); 
+
+        // create a menubar 
+        MenuBar mb = new MenuBar(); 
+
+        // add menu to menubar 
+        mb.getMenus().add(m); 
+
+        // create a VBox 
+        VBox vb = new VBox(mb); 
 
         FileHandler f = new FileHandler();
         f.loadUsers();
@@ -120,49 +169,50 @@ public class GUI extends Application {
         }
         for (int i = 0; i < cards.size() - 5; i++) {
             Button cardContainer = new Button(cards.get(i).getTitle());
-            cardContainer.setStyle("-fx-background-color: white;");
+            cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
             cardContainer.setAlignment(Pos.BASELINE_LEFT);
             cardContainer.setEffect(ds);
             cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
             column2.getChildren().add(cardContainer);
         }
         Button cardContainer = new Button(cards.get(7).getTitle());
-        cardContainer.setStyle("-fx-background-color: white;");
+        cardContainer.setStyle("-fx-background-color: white; -fx-pref-width: 200px;");
         cardContainer.setAlignment(Pos.BASELINE_LEFT);
         cardContainer.setEffect(ds);
         cardContainer.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, eventHandler);
         column3.getChildren().add(cardContainer);
 
-        Label connectionStatus = new Label("Not connected ");
-        Circle c = new Circle(8, Color.RED);
-        Group circle = new Group(c);
-
-        HBox connectionIndicator = new HBox();
-        connectionIndicator.getChildren().addAll(connectionStatus, circle);
-
-        Region region = new Region();
-        HBox.setHgrow(region, Priority.ALWAYS);
+        Label projectName = new Label("Project Title");
 
         HBox header = new HBox();
-        header.getChildren().addAll(region, connectionIndicator);
+        header.getChildren().addAll(projectName);
+        header.setAlignment(Pos.CENTER);
 
         ComboBox userSelection = new ComboBox();
         userSelection.getItems().addAll(users);
 
-        HBox hBox = new HBox();
-        hBox.setPadding(new Insets(10,10,10,10));
-        hBox.setSpacing(10);
-        hBox.getChildren().addAll(titleInput, descriptionInput, userSelection, addButton);
+        HBox control = new HBox();
+        control.setPadding(new Insets(10,10,10,10));
+        control.setSpacing(10);
+        control.getChildren().addAll(titleInput, descriptionInput, userSelection, addButton);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(gridPane);
-        scrollPane.setStyle("-fx-stroke-width: 0");
+        scrollPane.setPrefHeight(500);
 
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(20));
-        root.setTop(header);
-        root.setCenter(scrollPane);
-        root.setBottom(hBox);
+
+        VBox root = new VBox();
+        BorderPane content = new BorderPane();
+        content.setPadding(new Insets(20));
+        content.setTop(header);
+        content.setCenter(scrollPane);
+
+        // Gap
+        Region spacer = new Region();
+        root.setVgrow(spacer, Priority.ALWAYS);
+
+        root.getChildren().addAll(mb, content, spacer, control);
+
         Scene scene = new Scene(root, 800, 600);
         window.setScene(scene);
         window.show();
@@ -185,6 +235,7 @@ public class GUI extends Application {
         // private User assignedUser;
         // private int boardId;
         // private int columnIndex;
+
 
         Card card = new Card();
         card.setTitle(titleInput.getText());
