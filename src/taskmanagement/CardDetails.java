@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -29,10 +30,10 @@ import javafx.stage.StageStyle;
  */
 public class CardDetails {
     
-    public static Text display() {
+    public static Card display(Card card) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
-        Text sceneTitle = new Text("Create new board");
+        Text sceneTitle = new Text(card.getTitle());
         sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         window.setTitle(sceneTitle.getText());
         window.setWidth(300);
@@ -45,29 +46,52 @@ public class CardDetails {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Label boardTitle = new Label("Board Title:");
-        grid.add(boardTitle, 0, 1);
+        if (card.getAssignedUser() != null) {
+            Label assignedUser = new Label(card.getAssignedUser().getName());
+            Label assignedUserRole = new Label(card.getAssignedUser().getRole());
 
-        TextField boardTextField = new TextField();
-        grid.add(boardTextField, 1, 1);
+            grid.add(assignedUser, 0, 0);
+            grid.add(assignedUserRole, 1, 0);
+        }
 
-        Button btn = new Button("Create Board");
+        System.out.println(card.getAssignedUser());
+
+        Label cardTitle = new Label("Card Title:");
+        grid.add(cardTitle, 0, 1);
+
+        TextField cardTextField = new TextField();
+        grid.add(cardTextField, 1, 1);
+
+        Label cardDesc = new Label("Card Title:");
+        grid.add(cardDesc, 0, 2);
+
+        TextArea cardDescField = new TextArea();
+        grid.add(cardDescField, 1, 2);
+
+        Button saveBtn = new Button("Save");
+        Button closeBtn = new Button("Close");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(btn);
-        grid.add(hbBtn, 1, 2);
+        hbBtn.getChildren().addAll(closeBtn, saveBtn);
+        grid.add(hbBtn, 1, 3);
 
-        Text boardTitleString = new Text();
-        btn.setOnAction(new EventHandler<ActionEvent>() {
+        boolean update = false;
+        saveBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                boardTitleString.setText(boardTextField.getText());
+                window.close();
+            }
+        });
+        closeBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
                 window.close();
             }
         });
 
-        window.setScene(new Scene(grid, 300, 175));
+        window.setScene(new Scene(grid, 400, 175));
         window.showAndWait();
-        return boardTitleString;
+
+        return update ? card : null;
     }
 }

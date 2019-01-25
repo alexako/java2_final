@@ -32,9 +32,9 @@ public class GUI extends Application {
     Stage window;
     TextField titleInput;
     ComboBox userSelection;
-    int todoIndex = 0;
-    int inProgressIndex = 0;
-    int reviewIndex = 0;
+    int todoIndex = 1;
+    int inProgressIndex = 1;
+    int reviewIndex = 1;
     FileHandler fileHandler;
     GridPane gridPane;
     ObservableList<Card> cards;
@@ -139,26 +139,6 @@ public class GUI extends Application {
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> addButtonClicked());
 
-        // Card click handler
-        EventHandler<javafx.scene.input.MouseEvent> eventHandler = 
-                    new EventHandler<javafx.scene.input.MouseEvent>() { 
-            @Override 
-            public void handle(javafx.scene.input.MouseEvent e) { 
-                System.out.println("Click!" + e); 
-            } 
-        };  
-
-        // Drop shadow for cards
-        DropShadow ds = new DropShadow();
-        ds.setBlurType(BlurType.GAUSSIAN);
-        ds.setColor(Color.DARKGRAY);
-        ds.setHeight(1);
-        ds.setWidth(1);
-        ds.setOffsetX(1);
-        ds.setOffsetY(1);
-        ds.setRadius(5);
-        ds.setSpread(0.01);
-
         // Load cards
         cards = getCards();
         loadCards();
@@ -237,7 +217,9 @@ public class GUI extends Application {
                     new EventHandler<javafx.scene.input.MouseEvent>() { 
             @Override 
             public void handle(javafx.scene.input.MouseEvent e) { 
-                System.out.println("Click!" + e); 
+                if (CardDetails.display(card) != null) {
+                    fileHandler.writeToFile(card);
+                }
             } 
         };  
 
@@ -265,12 +247,12 @@ public class GUI extends Application {
     }
 
     /**
-     * todoIndex = 0;
-     * inProgressIndex = 0;
-     * reviewIndex = 0;
+     * 0 todoIndex
+     * 1 inProgressIndex
+     * 2 reviewIndex
      */
     public int getColumnIndex(int column) {
-        int index = 0;
+        int index = 1;
 
         switch(column) {
             case 0: index = todoIndex; break;

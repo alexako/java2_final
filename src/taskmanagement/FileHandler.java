@@ -272,13 +272,31 @@ public class FileHandler {
     public ArrayList<Card> getCards() {
 	    ArrayList<Card> cards = new ArrayList();
 	    for (Object card : this.cards) {
-		    JSONObject cardObj = (JSONObject)card;
-		    cards.add(new Card(
-			cardObj.get("id").toString(),
-			cardObj.get("title").toString()
-		    ));
+			JSONObject cardObj = (JSONObject)card;
+			User user = getUserById(cardObj.get("assignedUser").toString());
+			Card c;
+			if (user != null) {
+				TeamMember t = new TeamMember(user.getId(), user.getName(), user.getRole());
+				c = new Card(cardObj.get("id").toString(), cardObj.get("title").toString(), t);
+			} else {
+				c = new Card(cardObj.get("id").toString(), cardObj.get("title").toString());
+			}
+			if (cardObj.get("description") != null) {
+				c.setDescription(cardObj.get("description").toString());
+			}
+		    cards.add(c);
 	    }
 
 	    return cards;
-    }
+	}
+	
+	public User getUserById(String userId) {
+		ArrayList<User> users = getUsers();
+		for(User user: users) {
+			if(user.getId().equals(userId)) {
+				return user;
+			}
+		}
+		return null;
+	}
 }
