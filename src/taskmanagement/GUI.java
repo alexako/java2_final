@@ -41,6 +41,7 @@ public class GUI extends Application {
     ObservableList<Card> cards;
     ArrayList<User> users;
     Board board = null;
+    Label projectName;
 
     public static void main(String[] args) {
         launch(args);
@@ -120,8 +121,10 @@ public class GUI extends Application {
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> addButtonClicked());
 
-
-        Label projectName = new Label("Project Title");
+        projectName = new Label("Project Title");
+        if (board != null) {
+            projectName.setText(board.getTitle());
+        }
 
         HBox header = new HBox();
         header.getChildren().addAll(projectName);
@@ -241,6 +244,13 @@ public class GUI extends Application {
         gridPane.add(column1, 0, 0);
         gridPane.add(column2, 1, 0);
         gridPane.add(column3, 2, 0);
+
+        if (board != null) {
+            projectName.setText(board.getTitle());
+        } else {
+            projectName.setText("Project Title");
+        }
+
 
         todoIndex = 1;
         inProgressIndex = 1;
